@@ -1,0 +1,30 @@
+repos:
+  - repo: local
+    hooks:
+      - id: biome-check
+        name: Biome lint & format
+        language: system
+        entry: bunx biome check --write --no-errors-on-unmatched
+        types_or: [javascript, jsx, ts, tsx, json]
+        pass_filenames: true
+
+      - id: markdownlint
+        name: Markdown lint
+        language: system
+        entry: bunx markdownlint-cli2
+        types: [markdown]
+        pass_filenames: true
+
+      - id: typecheck
+        name: TypeScript type check
+        language: system
+        entry: bun run typecheck
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: build
+        name: Build check
+        language: system
+        entry: bun run build
+        pass_filenames: false
+        stages: [pre-push]

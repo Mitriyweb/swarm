@@ -1,0 +1,29 @@
+{
+  "name": "swarm",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "biome check src/ test/ index.ts",
+    "lint:fix": "biome check --write src/ test/ index.ts",
+    "format": "biome format --write src/ test/ index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "build": "bun build index.ts --outdir dist --target bun",
+    "knip": "knip",
+    "knip:production": "knip --production"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@j178/prek": "0.3.3",
+    "@types/bun": "latest",
+    "knip": "^5",
+    "markdownlint-cli2": "0.21.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0"
+  }
+}
