@@ -84,15 +84,33 @@ src/types/
 
 ## Installation
 
+You can install the pre-compiled `swarm` CLI using the official installation script:
+
 ```bash
-git clone <repository-url>
+curl -sL https://github.com/Mitriyweb/swarm/releases/latest/download/install.sh | bash
+```
+
+Alternatively, to build from source:
+
+```bash
+git clone https://github.com/Mitriyweb/swarm.git
 cd swarm
 bun install
+bun run build:cli
 ```
 
 ---
 
 ## Usage
+
+### CLI Usage
+
+Once installed, you can use the `swarm` CLI:
+
+```bash
+swarm init       # configure a new multi-agent project
+swarm --version  # show installed version
+```
 
 ### Basic Example
 

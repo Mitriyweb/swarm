@@ -1,6 +1,6 @@
 {
-  "entry": ["examples/**/*.ts"],
-  "project": ["src/**/*.ts", "examples/**/*.ts", "test/**/*.ts"],
+  "entry": ["examples/**/*.ts", "cli.ts"],
+  "project": ["src/**/*.ts", "examples/**/*.ts", "test/**/*.ts", "cli.ts"],
   "ignoreDependencies": ["@j178/prek", "markdownlint-cli2", "@anthropic-ai/sdk"],
   "ignoreBinaries": ["tsc"]
 }

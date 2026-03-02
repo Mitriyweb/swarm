@@ -1,5 +1,5 @@
 {
   "permissions": {
-    "allow": ["Bash(bun run:*)", "Bash(bun test:*)"]
+    "allow": ["Bash(bun run:*)", "Bash(bun test:*)", "Bash(bun:*)", "Bash(chmod +x:*)"]
   }
 }
