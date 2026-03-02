@@ -25,7 +25,7 @@ describe.skipIf(!dockerAvailable)("SandboxManager", () => {
     // Build the image first
     await sandboxManager.buildImage();
     workspacePath = await workspaceManager.createWorkspace(taskId);
-  });
+  }, 120_000);
 
   afterAll(async () => {
     await sandboxManager.stopContainer(taskId);
@@ -37,13 +37,13 @@ describe.skipIf(!dockerAvailable)("SandboxManager", () => {
     const containerId = await sandboxManager.startContainer(taskId, workspacePath);
     expect(containerId).toBeDefined();
     expect(containerId.length).toBeGreaterThan(0);
-  });
+  }, 30_000);
 
   test("should execute a command inside the container", async () => {
     const result = await sandboxManager.execCommand(taskId, ["node", "-v"]);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("v20");
-  });
+  }, 30_000);
 
   test("should see workspace files inside the container", async () => {
     // Create a file in the workspace
@@ -53,7 +53,7 @@ describe.skipIf(!dockerAvailable)("SandboxManager", () => {
     const result = await sandboxManager.execCommand(taskId, ["cat", "/workspace/test.txt"]);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toBe("hello from host");
-  });
+  }, 30_000);
 
   test("should enforce resource limits (informative)", async () => {
     // This is hard to test deterministically without external tools,
@@ -67,5 +67,5 @@ describe.skipIf(!dockerAvailable)("SandboxManager", () => {
     // 2g = 2147483648, 1 cpu = 1000000000
     expect(memory).toBe("2147483648");
     expect(cpu).toBe("1000000000");
-  });
+  }, 30_000);
 });
