@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Lint & type-check
+        run: |
+          bun run lint
+          bun run typecheck
+
+      - name: Build binaries
+        run: |
+          mkdir -p dist
+          VERSION="${GITHUB_REF_NAME}"
+
+          targets=(
+            "bun-linux-x64:swarm-linux-x64"
+            "bun-linux-arm64:swarm-linux-arm64"
+            "bun-darwin-x64:swarm-darwin-x64"
+            "bun-darwin-arm64:swarm-darwin-arm64"
+          )
+
+          for entry in "${targets[@]}"; do
+            TARGET="${entry%%:*}"
+            ASSET="${entry##*:}"
+            echo "::group::Building ${ASSET}"
+            bun build cli.ts \
+              --compile \
+              --target "${TARGET}" \
+              --define "process.env.SWARM_VERSION=\"${VERSION}\"" \
+              --outfile "dist/${ASSET}"
+            echo "::endgroup::"
+          done
+
+          ls -lh dist/
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "swarm $GITHUB_REF_NAME" \
+            --generate-notes \
+            dist/swarm-linux-x64 \
+            dist/swarm-linux-arm64 \
+            dist/swarm-darwin-x64 \
+            dist/swarm-darwin-arm64 \
+            install.sh
