@@ -3,6 +3,7 @@ export * from "@/agents";
 export * from "@/api";
 export * from "@/executor";
 export * from "@/llm";
+export * from "@/ollama";
 export * from "@/logger";
 export * from "@/orchestrator";
 export * from "@/queue";
