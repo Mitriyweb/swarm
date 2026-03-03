@@ -12,7 +12,7 @@ const c = {
   bold: `${ESC}1m`,
 };
 
-export function paint(text: string, code: string): string {
+function paint(text: string, code: string): string {
   return `${code}${text}${RESET}`;
 }
 
