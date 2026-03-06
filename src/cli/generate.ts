@@ -92,6 +92,7 @@ function swarmConfigJson(config: InitConfig): string {
   }
 
   const out: Record<string, unknown> = {
+    skillsDir: config.skillsDir ?? ".swarm/skills",
     cycle: config.cycle,
     maxIterations: config.maxIterations,
     maxWorkers: config.maxWorkers,
@@ -134,7 +135,7 @@ function envExample(config: InitConfig): string {
 }
 
 export async function writeConfigs(config: InitConfig): Promise<string[]> {
-  const skillsDir = "src/configs/agents/skills";
+  const skillsDir = config.skillsDir ?? ".swarm/skills";
   await Bun.$`mkdir -p ${skillsDir}`.quiet();
 
   const created: string[] = [];
@@ -153,5 +154,15 @@ export async function writeConfigs(config: InitConfig): Promise<string[]> {
   await Bun.write(".env.example", envExample(config));
   created.push(".env.example");
 
+  return created;
+}
+
+/** Write only swarm.config.json and .env.example (skills were already downloaded remotely). */
+export async function writeRemoteSkills(config: InitConfig): Promise<string[]> {
+  const created: string[] = [];
+  await Bun.write("swarm.config.json", swarmConfigJson(config));
+  created.push("swarm.config.json");
+  await Bun.write(".env.example", envExample(config));
+  created.push(".env.example");
   return created;
 }

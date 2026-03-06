@@ -17,4 +17,5 @@ export interface InitConfig {
   defaultProvider: string;
   defaultModel: string;
   ollamaEndpoint?: string;
+  skillsDir?: string;
 }

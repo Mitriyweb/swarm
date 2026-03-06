@@ -5,13 +5,31 @@ interface Frontmatter {
   [key: string]: string;
 }
 
+function resolveSkillsDir(): string {
+  // 1. Read from swarm.config.json if present
+  const configPath = join(process.cwd(), "swarm.config.json");
+  const file = Bun.file(configPath);
+  // Synchronous-ish: check existence via size
+  try {
+    const raw = require("node:fs").readFileSync(configPath, "utf8");
+    const cfg = JSON.parse(raw) as { skillsDir?: string };
+    if (cfg.skillsDir) {
+      return join(process.cwd(), cfg.skillsDir);
+    }
+  } catch {
+    // no config or unreadable — fall through
+  }
+  // 2. Default to .swarm/skills in CWD
+  return join(process.cwd(), ".swarm", "skills");
+}
+
 export class ConfigLoader {
   private skillsDir: string;
   private toolsDir: string;
 
-  constructor(baseDir = join(import.meta.dir, "agents")) {
-    this.skillsDir = join(baseDir, "skills");
-    this.toolsDir = join(baseDir, "tools");
+  constructor(skillsDir?: string) {
+    this.skillsDir = skillsDir ?? resolveSkillsDir();
+    this.toolsDir = join(import.meta.dir, "agents", "tools");
   }
 
   private parse(content: string): { frontmatter: Frontmatter; body: string } {

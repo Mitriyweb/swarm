@@ -1,3 +1,6 @@
+# agent skills (fetched at init time, not committed)
+.swarm/
+
 # dependencies (bun install)
 node_modules
 
