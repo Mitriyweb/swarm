@@ -33,7 +33,7 @@ jobs:
         run: bun run knip:production
 
       - name: Security audit
-        run: bun audit --audit-level=high
+        run: bun run audit
 
       - name: Test
         run: bun test

@@ -14,7 +14,8 @@
     "build": "bun build index.ts --outdir dist --target bun",
     "build:cli": "mkdir -p dist && bun build cli.ts --compile --outfile dist/swarm",
     "knip": "knip",
-    "knip:production": "knip --production"
+    "knip:production": "knip --production",
+    "audit": "bun audit --audit-level=high"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
