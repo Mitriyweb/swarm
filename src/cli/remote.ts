@@ -1,9 +1,9 @@
-export interface RemoteFile {
+interface RemoteFile {
   name: string;
   path: string;
 }
 
-export interface RemoteSource {
+interface RemoteSource {
   id: string;
   label: string;
   description: string;
@@ -68,11 +68,7 @@ export const REMOTE_SOURCES: RemoteSource[] = [
   },
 ];
 
-export async function fetchRemoteFile(
-  repo: string,
-  branch: string,
-  filePath: string,
-): Promise<string> {
+async function fetchRemoteFile(repo: string, branch: string, filePath: string): Promise<string> {
   const encoded = filePath.split("/").map(encodeURIComponent).join("/");
   const url = `https://raw.githubusercontent.com/${repo}/${branch}/${encoded}`;
   const res = await fetch(url);
