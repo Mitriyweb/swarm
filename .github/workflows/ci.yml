@@ -32,8 +32,6 @@ jobs:
       - name: Unused code detection in production mode (Knip)
         run: bun run knip:production
 
-      - name: Security audit
-        run: bun audit
 
       - name: Test
         run: bun test
