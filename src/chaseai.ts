@@ -6,7 +6,7 @@ export interface ChaseAIConfig {
 export interface VerificationRequest {
   action: string;
   reason: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface VerificationResponse {
@@ -47,7 +47,7 @@ export class ChaseAIClient {
     let { id, status } = await this.requestVerification(request);
 
     while (status === "pending") {
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
       const response = await this.checkStatus(id);
       status = response.status;
     }

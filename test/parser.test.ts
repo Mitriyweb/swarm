@@ -1,4 +1,4 @@
-import { describe, it, expect, mock } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { parseStructuredResponse } from "@/agents/parser";
 import type { LLMProvider } from "@/types";
 
@@ -16,7 +16,7 @@ describe("parseStructuredResponse", () => {
   });
 
   it("should parse JSON within markdown blocks", async () => {
-    const raw = "Here is the plan:\n```json\n[{\"action\": \"list_dir\"}]\n```";
+    const raw = 'Here is the plan:\n```json\n[{"action": "list_dir"}]\n```';
     const result = await parseStructuredResponse(mockProvider, raw);
     expect(result).toHaveLength(1);
     expect(result[0].action).toBe("list_dir");
@@ -25,7 +25,9 @@ describe("parseStructuredResponse", () => {
   it("should retry on invalid JSON", async () => {
     const invalidRaw = "Not JSON at all";
     const fixedRaw = '[{"action": "create_file"}]';
-    (mockProvider.generate as any).mockResolvedValue(fixedRaw);
+    (
+      mockProvider.generate as unknown as { mockResolvedValue: (v: string) => void }
+    ).mockResolvedValue(fixedRaw);
 
     const result = await parseStructuredResponse(mockProvider, invalidRaw);
     expect(result).toHaveLength(1);

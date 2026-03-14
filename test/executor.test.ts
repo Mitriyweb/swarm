@@ -1,7 +1,7 @@
-import { describe, it, expect, mock } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { ToolExecutor } from "@/executor";
-import { ToolCommandName } from "@/types";
 import type { SandboxManager } from "@/sandbox";
+import { ToolCommandName } from "@/types";
 
 describe("ToolExecutor", () => {
   const mockSandbox = {
@@ -19,7 +19,7 @@ describe("ToolExecutor", () => {
     expect(mockSandbox.execCommand).toHaveBeenCalledWith(
       "test-task",
       ["cat", "test.txt"],
-      expect.any(Number)
+      expect.any(Number),
     );
   });
 

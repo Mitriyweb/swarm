@@ -1,8 +1,8 @@
-import { serve } from "bun";
-import { join } from "node:path";
 import { watch } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import type { SwarmAPI } from "@/api";
+import { serve } from "bun";
 
 export function startDashboard(api: SwarmAPI, port = 3000) {
   const logDir = join(process.cwd(), "logs");

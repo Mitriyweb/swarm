@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
+import { existsSync, unlinkSync } from "node:fs";
 import { SQLiteQueue } from "@/queue_sqlite";
 import { QueuedTaskStatus } from "@/types";
-import { unlinkSync, existsSync } from "node:fs";
 
 describe("SQLiteQueue", () => {
   const dbFile = "test-tasks.db";

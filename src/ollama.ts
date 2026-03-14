@@ -1,5 +1,5 @@
-import type { LLMProvider, LLMUsage } from "@/types";
 import { withRetry } from "@/retry";
+import type { LLMProvider, LLMUsage } from "@/types";
 
 export interface OllamaConfig {
   endpoint?: string;
@@ -32,8 +32,8 @@ export class OllamaProvider implements LLMProvider {
       });
 
       if (!r.ok) {
-        const error = new Error(`Ollama request failed: ${r.status} ${r.statusText}`) as any;
-        error.status = r.status;
+        const error = new Error(`Ollama request failed: ${r.status} ${r.statusText}`);
+        Object.assign(error, { status: r.status });
         throw error;
       }
       return r;

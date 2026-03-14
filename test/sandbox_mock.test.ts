@@ -1,4 +1,4 @@
-import { describe, it, expect, mock } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { SandboxManager } from "@/sandbox";
 
 // We can mock the Bun shell ($) by overriding it or using a wrapper
@@ -7,13 +7,13 @@ import { SandboxManager } from "@/sandbox";
 describe("SandboxManager", () => {
   it("should initialize with default options", () => {
     const sandbox = new SandboxManager();
-    expect(sandbox["cpuLimit"]).toBe("1");
-    expect(sandbox["memoryLimit"]).toBe("2g");
+    expect(sandbox.cpuLimit).toBe("1");
+    expect(sandbox.memoryLimit).toBe("2g");
   });
 
   it("should initialize with custom options", () => {
     const sandbox = new SandboxManager({ cpuLimit: "2", memoryLimit: "4g" });
-    expect(sandbox["cpuLimit"]).toBe("2");
-    expect(sandbox["memoryLimit"]).toBe("4g");
+    expect(sandbox.cpuLimit).toBe("2");
+    expect(sandbox.memoryLimit).toBe("4g");
   });
 });
