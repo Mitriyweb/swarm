@@ -1,25 +1,43 @@
 import { QueuedTaskStatus } from "@/types";
 import type { SwarmConfig, TaskRecord } from "@/types";
 import { WorkerPool } from "@/worker";
+import { startDashboard } from "./dashboard";
 
 export class SwarmAPI {
   private pool: WorkerPool;
 
   constructor(config: SwarmConfig) {
-    this.pool = new WorkerPool(config.provider, config.maxWorkers ?? 4);
+    this.pool = new WorkerPool(config.provider, config.maxWorkers ?? 4, config.queue);
+
+    if (config.enableDashboard) {
+      startDashboard(this, config.dashboardPort ?? 3000);
+      console.log(`Dashboard started on http://localhost:${config.dashboardPort ?? 3000}`);
+    }
   }
 
   /**
    * Submits a new task to the swarm.
    */
-  submit(taskId: string, prompt: string, maxIterations?: number): TaskRecord {
+  async submit(taskId: string, prompt: string, maxIterations?: number): Promise<TaskRecord> {
     return this.pool.submit({ taskId, prompt, maxIterations });
+  }
+
+  /**
+   * @deprecated Use submit() instead.
+   */
+  submitSync(taskId: string, prompt: string, maxIterations?: number): TaskRecord {
+    // This is problematic because we can't easily make it sync now that the queue is async
+    // However, for InMemoryQueue it might be possible if we don't await
+    // But better to just let it return the record from the in-memory state if available
+    throw new Error(
+      "submitSync is no longer supported. Please use the asynchronous submit() method.",
+    );
   }
 
   /**
    * Returns the current status of a task.
    */
-  getStatus(taskId: string): TaskRecord | undefined {
+  async getStatus(taskId: string): Promise<TaskRecord | undefined> {
     return this.pool.getStatus(taskId);
   }
 
@@ -30,7 +48,7 @@ export class SwarmAPI {
     const start = Date.now();
 
     while (Date.now() - start < timeoutMs) {
-      const record = this.getStatus(taskId);
+      const record = await this.getStatus(taskId);
       if (
         record &&
         (record.status === QueuedTaskStatus.DONE || record.status === QueuedTaskStatus.FAILED)

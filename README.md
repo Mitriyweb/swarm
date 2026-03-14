@@ -13,6 +13,8 @@ Swarm is a secure, isolated sandbox execution environment for multi-agent AI wor
 - **LLM Agnostic**: Abstracted `LLMProvider` interface (currently Anthropic). Token usage tracked automatically.
 - **Per-Task Workspaces**: Automatic Git branch per task workspace.
 - **JSONL Audit Logging**: Every agent action and tool execution is logged for complete observability.
+- **ChaseAI Integration**: Human-in-the-loop verification for sensitive operations (e.g., `delete_file`).
+- **Web Dashboard**: Real-time log streaming and task monitoring via SSE.
 
 ---
 
@@ -134,6 +136,22 @@ bun run examples/basic.ts
 
 ```bash
 bun run examples/concurrency.ts
+```
+
+### ChaseAI Integration
+
+Swarm integrates with [ChaseAI](https://github.com/Mitriyweb/ChaseAI) for human-in-the-loop verification. ChaseAI is a tray-based orchestrator that provides a local API for approving sensitive actions.
+
+To enable ChaseAI integration:
+1. Install and run ChaseAI from its repository.
+2. Configure `ToolExecutor` with `chaseAIConfig`.
+
+```typescript
+const executor = new ToolExecutor(sandbox, logger, [], {
+  enabled: true,
+  endpoint: "http://localhost:8090",
+  sensitiveActions: [ToolCommandName.DELETE_FILE, ToolCommandName.MODIFY_FILE]
+});
 ```
 
 ---
