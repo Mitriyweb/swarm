@@ -43,10 +43,19 @@ export class ChaseAIClient {
     return (await res.json()) as VerificationResponse;
   }
 
-  async waitForApproval(request: VerificationRequest, pollInterval = 2000): Promise<boolean> {
+  async waitForApproval(
+    request: VerificationRequest,
+    pollInterval = 2000,
+    maxWaitMs = 300000,
+  ): Promise<boolean> {
     let { id, status } = await this.requestVerification(request);
+    const start = Date.now();
 
     while (status === "pending") {
+      if (Date.now() - start > maxWaitMs) {
+        console.warn(`ChaseAI verification timed out after ${maxWaitMs}ms`);
+        return false;
+      }
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
       const response = await this.checkStatus(id);
       status = response.status;

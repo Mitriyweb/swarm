@@ -23,6 +23,18 @@ export class SwarmAPI {
   }
 
   /**
+   * @deprecated Use submit() instead.
+   */
+  submitSync(taskId: string, prompt: string, maxIterations?: number): TaskRecord {
+    // This is problematic because we can't easily make it sync now that the queue is async
+    // However, for InMemoryQueue it might be possible if we don't await
+    // But better to just let it return the record from the in-memory state if available
+    throw new Error(
+      "submitSync is no longer supported. Please use the asynchronous submit() method.",
+    );
+  }
+
+  /**
    * Returns the current status of a task.
    */
   async getStatus(taskId: string): Promise<TaskRecord | undefined> {
