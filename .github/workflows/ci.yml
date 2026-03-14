@@ -33,7 +33,7 @@ jobs:
         run: bun run knip:production
 
       - name: Security audit
-        run: bun run audit
+        run: bun audit
 
       - name: Test
         run: bun test
