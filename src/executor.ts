@@ -4,16 +4,22 @@ import type { SandboxManager } from "@/sandbox";
 import { ToolCommandName } from "@/types";
 import type { ToolCommand, ToolResult } from "@/types";
 import type { ToolConfig } from "@/types/config";
+import { ChaseAIClient } from "./chaseai";
 
 export class ToolExecutor {
   private timeouts: Record<string, number>;
   private pathValidatedCommands: Set<string>;
+  private chaseAI?: ChaseAIClient;
 
   constructor(
     private sandbox: SandboxManager,
     private logger?: Logger,
     toolConfigs: ToolConfig[] = [],
+    chaseAIConfig?: { endpoint?: string; enabled?: boolean },
   ) {
+    if (chaseAIConfig?.enabled) {
+      this.chaseAI = new ChaseAIClient(chaseAIConfig);
+    }
     // Build timeout map from configs; fall back to 30s default
     this.timeouts = { default: 30000 };
     this.pathValidatedCommands = new Set();
@@ -45,6 +51,20 @@ export class ToolExecutor {
    * Executes a whitelisted tool command inside a sandbox container.
    */
   async execute(taskId: string, command: ToolCommand): Promise<ToolResult> {
+    if (this.chaseAI && command.name === ToolCommandName.DELETE_FILE) {
+      if (this.logger) {
+        await this.logger.log(taskId, "INFO" as any, `Requesting human verification for ${command.name} via ChaseAI...`);
+      }
+      const approved = await this.chaseAI.waitForApproval({
+        action: `Delete file: ${command.args.path}`,
+        reason: "Sensitive operation requested by agent",
+        context: { taskId, command }
+      });
+      if (!approved) {
+        return { stdout: "", stderr: "Operation rejected by user via ChaseAI", exitCode: 1, success: false };
+      }
+    }
+
     let shellCmd: string[] = [];
 
     if (this.pathValidatedCommands.has(command.name) && command.args.path) {

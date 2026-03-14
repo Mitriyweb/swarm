@@ -1,4 +1,5 @@
 import type { LLMProvider, LLMUsage } from "@/types";
+import { withRetry } from "@/retry";
 
 export interface OllamaConfig {
   endpoint?: string;
@@ -23,15 +24,20 @@ export class OllamaProvider implements LLMProvider {
   }
 
   async generate(prompt: string): Promise<string> {
-    const res = await fetch(`${this.endpoint}/api/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: this.model, prompt, stream: false }),
-    });
+    const res = await withRetry(async () => {
+      const r = await fetch(`${this.endpoint}/api/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: this.model, prompt, stream: false }),
+      });
 
-    if (!res.ok) {
-      throw new Error(`Ollama request failed: ${res.status} ${res.statusText}`);
-    }
+      if (!r.ok) {
+        const error = new Error(`Ollama request failed: ${r.status} ${r.statusText}`) as any;
+        error.status = r.status;
+        throw error;
+      }
+      return r;
+    });
 
     const data = (await res.json()) as OllamaResponse;
 
