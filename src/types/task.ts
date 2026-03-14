@@ -28,12 +28,3 @@ export interface TaskContext {
   error?: string;
 }
 
-export interface TaskRecord {
-  request: TaskRequest;
-  status: QueuedTaskStatus;
-  result?: boolean;
-  error?: string;
-  enqueuedAt: number;
-  startedAt?: number;
-  finishedAt?: number;
-}

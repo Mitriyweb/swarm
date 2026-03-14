@@ -42,7 +42,7 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions =
       }
 
       console.warn(
-        `Retryable error occurred: ${error.message}. Retrying in ${delay.toFixed(0)}ms... (Attempt ${retries}/${maxRetries})`,
+        `Retryable error occurred: ${err.message}. Retrying in ${delay.toFixed(0)}ms... (Attempt ${retries}/${maxRetries})`,
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
     }

@@ -6,13 +6,13 @@ import { SandboxManager } from "@/sandbox";
 
 describe("SandboxManager", () => {
   it("should initialize with default options", () => {
-    const sandbox = new SandboxManager();
+    const sandbox = new SandboxManager() as any;
     expect(sandbox.cpuLimit).toBe("1");
     expect(sandbox.memoryLimit).toBe("2g");
   });
 
   it("should initialize with custom options", () => {
-    const sandbox = new SandboxManager({ cpuLimit: "2", memoryLimit: "4g" });
+    const sandbox = new SandboxManager({ cpuLimit: "2", memoryLimit: "4g" }) as any;
     expect(sandbox.cpuLimit).toBe("2");
     expect(sandbox.memoryLimit).toBe("4g");
   });
