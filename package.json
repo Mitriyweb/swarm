@@ -15,7 +15,7 @@
     "build:cli": "mkdir -p dist && bun build cli.ts --compile --outfile dist/swarm",
     "knip": "knip",
     "knip:production": "knip --production",
-    "audit": "bun audit --audit-level=high"
+    "audit": "bun audit"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
