@@ -27,4 +27,3 @@ export interface TaskContext {
   status: TaskStatus;
   error?: string;
 }
-
