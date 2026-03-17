@@ -28,3 +28,10 @@ repos:
         entry: bun run build
         pass_filenames: false
         stages: [pre-push]
+
+      - id: audit
+        name: Security audit
+        language: system
+        entry: bun audit --audit-level=high
+        pass_filenames: false
+        stages: [pre-push]
