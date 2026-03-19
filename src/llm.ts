@@ -1,3 +1,4 @@
+import { withRetry } from "@/retry";
 import type { LLMConfig, LLMProvider, LLMUsage } from "@/types";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -26,11 +27,13 @@ export class AnthropicProvider implements LLMProvider {
    */
   async generate(prompt: string): Promise<string> {
     try {
-      const message = await this.client.messages.create({
-        model: this.model,
-        max_tokens: this.maxTokens,
-        messages: [{ role: "user", content: prompt }],
-      });
+      const message = await withRetry(() =>
+        this.client.messages.create({
+          model: this.model,
+          max_tokens: this.maxTokens,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      );
 
       if (message.usage) {
         this.usage.promptTokens += message.usage.input_tokens;

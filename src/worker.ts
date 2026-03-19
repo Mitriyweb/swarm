@@ -1,8 +1,8 @@
 import { Logger } from "@/logger";
 import { Orchestrator } from "@/orchestrator";
-import { TaskQueue } from "@/queue";
+import { InMemoryQueue } from "@/queue";
 import { QueuedTaskStatus } from "@/types";
-import type { LLMProvider, TaskRecord, TaskRequest } from "@/types";
+import type { LLMProvider, QueueAdapter, TaskRecord, TaskRequest } from "@/types";
 
 /**
  * Worker pool that manages concurrent Orchestrator instances.
@@ -11,22 +11,23 @@ import type { LLMProvider, TaskRecord, TaskRequest } from "@/types";
  */
 export class WorkerPool {
   private activeWorkers = 0;
-  private queue: TaskQueue;
+  private queue: QueueAdapter;
   private logger: Logger;
 
   constructor(
     private provider: LLMProvider,
     private maxWorkers = 4,
+    queue?: QueueAdapter,
   ) {
-    this.queue = new TaskQueue();
+    this.queue = queue ?? new InMemoryQueue();
     this.logger = new Logger();
   }
 
   /**
    * Submits a task to the queue. Returns the initial task record.
    */
-  submit(request: TaskRequest): TaskRecord {
-    const record = this.queue.enqueue(request);
+  async submit(request: TaskRequest): Promise<TaskRecord> {
+    const record = await this.queue.enqueue(request);
     this.processNext();
     return record;
   }
@@ -34,21 +35,21 @@ export class WorkerPool {
   /**
    * Gets the current status of a task.
    */
-  getStatus(taskId: string): TaskRecord | undefined {
+  async getStatus(taskId: string): Promise<TaskRecord | undefined> {
     return this.queue.getRecord(taskId);
   }
 
   /**
    * Processes the next task in the queue if a worker slot is available.
    */
-  private processNext(): void {
+  private async processNext(): Promise<void> {
     if (this.activeWorkers >= this.maxWorkers) return;
 
-    const next = this.queue.dequeue();
+    const next = await this.queue.dequeue();
     if (!next) return;
 
     this.activeWorkers++;
-    this.queue.updateRecord(next.taskId, {
+    await this.queue.updateRecord(next.taskId, {
       status: QueuedTaskStatus.RUNNING,
       startedAt: Date.now(),
     });
@@ -57,15 +58,15 @@ export class WorkerPool {
       .then((orchestrator) =>
         orchestrator.executeTask(next.taskId, next.prompt, next.maxIterations),
       )
-      .then((result) => {
-        this.queue.updateRecord(next.taskId, {
+      .then(async (result) => {
+        await this.queue.updateRecord(next.taskId, {
           status: result ? QueuedTaskStatus.DONE : QueuedTaskStatus.FAILED,
           result,
           finishedAt: Date.now(),
         });
       })
-      .catch((err: Error) => {
-        this.queue.updateRecord(next.taskId, {
+      .catch(async (err: Error) => {
+        await this.queue.updateRecord(next.taskId, {
           status: QueuedTaskStatus.FAILED,
           error: err.message,
           finishedAt: Date.now(),

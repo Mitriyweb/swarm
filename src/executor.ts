@@ -1,19 +1,33 @@
 import type { Logger } from "@/logger";
 import { validateFilePath } from "@/safety";
 import type { SandboxManager } from "@/sandbox";
-import { ToolCommandName } from "@/types";
+import { LogLevel, ToolCommandName } from "@/types";
 import type { ToolCommand, ToolResult } from "@/types";
 import type { ToolConfig } from "@/types/config";
+import { ChaseAIClient } from "./chaseai";
 
 export class ToolExecutor {
   private timeouts: Record<string, number>;
   private pathValidatedCommands: Set<string>;
+  private chaseAI?: ChaseAIClient;
+  private sensitiveActions: Set<ToolCommandName> = new Set();
 
   constructor(
     private sandbox: SandboxManager,
     private logger?: Logger,
     toolConfigs: ToolConfig[] = [],
+    chaseAIConfig?: {
+      endpoint?: string;
+      enabled?: boolean;
+      sensitiveActions?: ToolCommandName[];
+    },
   ) {
+    if (chaseAIConfig?.enabled) {
+      this.chaseAI = new ChaseAIClient(chaseAIConfig);
+      this.sensitiveActions = new Set(
+        chaseAIConfig.sensitiveActions || [ToolCommandName.DELETE_FILE],
+      );
+    }
     // Build timeout map from configs; fall back to 30s default
     this.timeouts = { default: 30000 };
     this.pathValidatedCommands = new Set();
@@ -45,6 +59,29 @@ export class ToolExecutor {
    * Executes a whitelisted tool command inside a sandbox container.
    */
   async execute(taskId: string, command: ToolCommand): Promise<ToolResult> {
+    if (this.chaseAI && this.sensitiveActions.has(command.name)) {
+      if (this.logger) {
+        await this.logger.log(
+          taskId,
+          LogLevel.INFO,
+          `Requesting human verification for ${command.name} via ChaseAI...`,
+        );
+      }
+      const approved = await this.chaseAI.waitForApproval({
+        action: `${command.name} on ${command.args.path || "project"}`,
+        reason: "Sensitive operation requested by agent",
+        context: { taskId, command },
+      });
+      if (!approved) {
+        return {
+          stdout: "",
+          stderr: "Operation rejected by user via ChaseAI",
+          exitCode: 1,
+          success: false,
+        };
+      }
+    }
+
     let shellCmd: string[] = [];
 
     if (this.pathValidatedCommands.has(command.name) && command.args.path) {

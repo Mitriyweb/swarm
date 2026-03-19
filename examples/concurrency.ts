@@ -30,9 +30,9 @@ async function test() {
 
   const api = new SwarmAPI({ provider: new MockProvider(), maxWorkers: 2 });
 
-  const t1 = api.submit("task-1", "Build a REST API");
-  const t2 = api.submit("task-2", "Build a CLI tool");
-  const t3 = api.submit("task-3", "Build a parser");
+  const t1 = await api.submit("task-1", "Build a REST API");
+  const t2 = await api.submit("task-2", "Build a CLI tool");
+  const t3 = await api.submit("task-3", "Build a parser");
 
   console.log("Tasks submitted:", [t1.status, t2.status, t3.status]);
   console.log("Active workers (should be ≤2):", api.activeWorkers);
