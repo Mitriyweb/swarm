@@ -9,7 +9,7 @@ Swarm is a secure, isolated sandbox execution environment for multi-agent AI wor
 - **Secure Docker Sandbox**: Zero network access (`--network none`), read-only root filesystem, restricted privileges (`--security-opt no-new-privileges`), strict CPU/Memory limits.
 - **Structured Tool Execution**: Agents interact exclusively via a structured JSON protocol and a whitelisted set of shell commands.
 - **Safety First**: Built-in path traversal safeguards and prompt injection detection.
-- **Concurrency & Queuing**: `SwarmAPI` worker pool manages multiple concurrent orchestrators with an in-memory task queue. No shared state between tasks.
+- **Concurrency & Queuing**: `SwarmAPI` worker pool manages multiple concurrent orchestrators with a SQLite-backed task queue, supporting persistence and automatic retries. No shared state between tasks.
 - **LLM Agnostic**: Abstracted `LLMProvider` interface (currently Anthropic). Token usage tracked automatically.
 - **Per-Task Workspaces**: Automatic Git branch per task workspace.
 - **JSONL Audit Logging**: Every agent action and tool execution is logged for complete observability.
@@ -77,7 +77,7 @@ src/types/
   executor.ts   ToolCommandName (enum), ToolCommand, ToolResult
   logger.ts     LogLevel (enum), LogEntry
   llm.ts        LLMConfig, LLMUsage, LLMProvider
-  queue.ts      QueuedTaskStatus (enum), TaskRequest
+  queue.ts      QueuedTaskStatus (enum), TaskRequest, QueueAdapter
   task.ts       TaskStatus (enum), OrchestrationState (enum), TaskContext, TaskRecord
   workspace.ts  SandboxOptions, WorkspaceOptions
 ```
@@ -143,6 +143,7 @@ bun run examples/concurrency.ts
 Swarm integrates with [ChaseAI](https://github.com/Mitriyweb/ChaseAI) for human-in-the-loop verification. ChaseAI is a tray-based orchestrator that provides a local API for approving sensitive actions.
 
 To enable ChaseAI integration:
+
 1. Install and run ChaseAI from its repository.
 2. Configure `ToolExecutor` with `chaseAIConfig`.
 

@@ -41,7 +41,7 @@ src/
     executor.ts           # ToolCommandName, ToolCommand, ToolResult
     logger.ts             # LogLevel, LogEntry
     llm.ts                # LLMConfig, LLMUsage, LLMProvider
-    queue.ts              # QueuedTaskStatus, TaskRequest
+    queue.ts              # QueuedTaskStatus, TaskRequest, QueueAdapter
     task.ts               # TaskStatus, OrchestrationState, TaskContext, TaskRecord
     workspace.ts          # SandboxOptions, WorkspaceOptions
   agents/
@@ -50,11 +50,15 @@ src/
     dynamic.ts            # DynamicAgent — generic agent loaded from AgentSkillConfig
     parser.ts             # parseStructuredResponse
   api.ts                  # SwarmAPI
+  chaseai.ts              # ChaseAI integration for human-in-the-loop
+  dashboard.ts            # SSE-based web dashboard for log streaming
   executor.ts             # ToolExecutor (tool whitelist)
   llm.ts                  # AnthropicProvider
   logger.ts               # Logger (JSONL audit trail)
   orchestrator.ts         # Orchestrator (multi-agent loop) — use Orchestrator.create()
-  queue.ts                # TaskQueue
+  queue.ts                # InMemoryQueue
+  queue_sqlite.ts         # SQLiteQueue (persistent task queue)
+  retry.ts                # Retry logic for API calls
   safety.ts               # validateFilePath, detectPromptInjection
   sandbox.ts              # SandboxManager (Docker)
   task.ts                 # TaskRunner (state machine)

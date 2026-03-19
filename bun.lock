@@ -8,7 +8,7 @@
         "@anthropic-ai/sdk": "^0.78.0",
       },
       "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
+        "@biomejs/biome": "1.9.4",
         "@j178/prek": "0.3.3",
         "@types/bun": "latest",
         "knip": "^5",
