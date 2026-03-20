@@ -34,4 +34,15 @@ describe("parseStructuredResponse", () => {
     expect(result[0]?.action).toBe("create_file");
     expect(mockProvider.generate).toHaveBeenCalled();
   });
+
+  it("should throw error after exhausting retries", async () => {
+    const invalidRaw = "Not JSON at all";
+    (
+      mockProvider.generate as unknown as { mockResolvedValue: (v: string) => void }
+    ).mockResolvedValue("Still not JSON");
+
+    await expect(parseStructuredResponse(mockProvider, invalidRaw, 1)).rejects.toThrow(
+      "Failed to parse structured response after retries: Still not JSON",
+    );
+  });
 });
