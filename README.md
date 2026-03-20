@@ -138,22 +138,33 @@ bun run examples/basic.ts
 bun run examples/concurrency.ts
 ```
 
-### ChaseAI Integration
+## Human-in-the-Loop (ChaseAI)
 
-Swarm integrates with [ChaseAI](https://github.com/Mitriyweb/ChaseAI) for human-in-the-loop verification. ChaseAI is a tray-based orchestrator that provides a local API for approving sensitive actions.
+Swarm supports optional human approval for sensitive agent actions (e.g. file deletion) via [ChaseAI](https://chaseai.dev).
 
-To enable ChaseAI integration:
+### Setup
 
-1. Install and run ChaseAI from its repository.
-2. Configure `ToolExecutor` with `chaseAIConfig`.
+Start the ChaseAI verification server locally:
 
-```typescript
-const executor = new ToolExecutor(sandbox, logger, [], {
-  enabled: true,
-  endpoint: "http://localhost:8090",
-  sensitiveActions: [ToolCommandName.DELETE_FILE, ToolCommandName.MODIFY_FILE]
+```bash
+docker run -p 8090:8090 chaseai/server
+```
+
+### Configuration
+
+Pass `chaseAIConfig` when constructing `SwarmAPI`:
+
+```ts
+const swarm = new SwarmAPI({
+  provider,
+  chaseAIConfig: {
+    enabled: true,
+    endpoint: 'http://localhost:8090', // default
+  },
 });
 ```
+
+When enabled, the agent will pause and request approval before executing any action listed in `sensitiveActions` (default: `delete_file`). Approval requests appear in the ChaseAI UI at `http://localhost:8090`.
 
 ---
 
