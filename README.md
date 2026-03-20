@@ -165,7 +165,7 @@ const swarm = new SwarmAPI({
 
 When enabled, the agent pauses and requests approval before executing
 any sensitive action. Approve or reject requests in the ChaseAI UI
-at http://localhost:8090.
+at <http://localhost:8090>.
 
 ---
 
