@@ -35,3 +35,10 @@ repos:
         entry: bun audit --audit-level=high
         pass_filenames: false
         stages: [pre-push]
+
+      - id: tests
+        name: Run tests
+        language: system
+        entry: bun run test
+        pass_filenames: false
+        stages: [pre-push]
