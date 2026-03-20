@@ -21,14 +21,13 @@ export function startDashboard(api: SwarmAPI, port = 3000) {
       if (url.pathname === "/events") {
         const stream = new ReadableStream({
           async start(controller) {
-            // 1. Send historical events first
+            // Send historical events first
             try {
               const files = readdirSync(logDir).filter((f) => f.endsWith(".jsonl"));
               for (const file of files) {
                 const content = readFileSync(join(logDir, file), "utf-8");
                 const lines = content.trim().split("\n").filter(Boolean);
-                const last50 = lines.slice(-50);
-                for (const line of last50) {
+                for (const line of lines.slice(-50)) {
                   controller.enqueue(`data: ${line}\n\n`);
                 }
               }
@@ -36,7 +35,7 @@ export function startDashboard(api: SwarmAPI, port = 3000) {
               /* logs dir may not exist yet */
             }
 
-            // 2. Then stream new events via fs.watch
+            // Then stream new events
             const watcher = watch(logDir, { recursive: true }, async (event, filename) => {
               if (filename?.endsWith(".jsonl")) {
                 const fullPath = join(logDir, filename);
