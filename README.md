@@ -140,19 +140,18 @@ bun run examples/concurrency.ts
 
 ## Human-in-the-Loop (ChaseAI)
 
-Swarm supports optional human approval for sensitive agent actions (e.g. file deletion) via [ChaseAI](https://chaseai.dev).
+Swarm supports optional human approval for sensitive agent actions
+(e.g. file deletion) via ChaseAI.
 
 ### Setup
 
-Start the ChaseAI verification server locally:
+Start the ChaseAI verification server:
 
 ```bash
 docker run -p 8090:8090 chaseai/server
 ```
 
 ### Configuration
-
-Pass `chaseAIConfig` when constructing `SwarmAPI`:
 
 ```ts
 const swarm = new SwarmAPI({
@@ -164,7 +163,9 @@ const swarm = new SwarmAPI({
 });
 ```
 
-When enabled, the agent will pause and request approval before executing any action listed in `sensitiveActions` (default: `delete_file`). Approval requests appear in the ChaseAI UI at `http://localhost:8090`.
+When enabled, the agent pauses and requests approval before executing
+any sensitive action. Approve or reject requests in the ChaseAI UI
+at <http://localhost:8090>.
 
 ---
 
